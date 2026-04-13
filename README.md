@@ -124,17 +124,4 @@ results/
 | SAM3 | 文本概念分割 | `F:/VLAproject/facebook/sam3/sam3.pt` |
 | MoGe2 (`moge-2-vitl`) | 单目几何估计（深度 + 点图） | HuggingFace 缓存（已离线） |
 
----
 
-## diagnose/
-
-调试阶段遗留的一次性脚本，不参与主流程：
-
-| 文件 | 内容 |
-|---|---|
-| `diagnose_depth.py` | 深度窗口诊断 |
-| `diagnose_fingertip.py` | 手部关节投影可视化 |
-| `diagnose_mask.py` | mask + ROI 快速查看 |
-| `diagnose_roi.py` | ROI 与手部像素分布 |
-| `dump_results.py` | 打印旧版 `analysis_results.json` |
-| `peek_frame.py` | 快速读取视频帧 |
