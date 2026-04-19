@@ -1,0 +1,134 @@
+<mujoco model="scene">
+
+    <compiler angle="radian" autolimits="true" />
+    <option timestep="0.002" integrator="implicitfast" solver="PGS" gravity="0 0 -9.82"
+            cone="elliptic">
+		<!--		 <flag multiccd="enable"/>-->
+    </option>
+
+    <include file="../universal_robots_ur5e/ur5e.xml" />
+    <include file="../robotiq_2f85/2f85.xml" />
+
+
+    <statistic center="0.3 0 0.3" extent="0.8" meansize="0.08" />
+
+    <visual>
+        <headlight diffuse="0.6 0.6 0.6" ambient="0.1 0.1 0.1" specular="0 0 0" />
+        <rgba haze="0.15 0.25 0.35 1" />
+        <global azimuth="120" elevation="-20" />
+    </visual>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512"
+                 height="3072" />
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
+                 rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+        <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5"
+                  reflectance="0.2" />
+
+        <!--meshes-->
+        <mesh name ="table" file="../table/sigmund_table.stl" scale= "1 1 1"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
+		<geom name="floor" size="0 0 0.05" type="plane" material="groundplane" />
+		<geom name="x-aixs" group="2" type="cylinder" contype="0" conaffinity="0"
+			fromto="0 0 0 1 0 0" size="0.01" rgba="1 0 0 1" />
+		<geom name="y-aixs" group="2" type="cylinder" contype="0" conaffinity="0"
+			fromto="0 0 0 0 1 0" size="0.01" rgba="0 1 0 1" />
+		<geom name="z-aixs" group="2" type="cylinder" contype="0" conaffinity="0"
+			fromto="0 0 0 0 0 1" size="0.01" rgba="0 0 1 1" />
+
+		<camera name="cam" pos="1.0 0.6 2.0" xyaxes="0 -1 0 1 0 0.5" mode="fixed" />
+
+		<body name="mocap" mocap="true" pos="0.8 0.6 0.74">
+			<geom name="mocap" type="sphere" size="0.000001"/>
+		</body>
+
+		<!-- Other primitives disabled — scissors-only scene for prior testing -->
+		<!-- Cylinder, Box, T_block commented out -->
+
+		<!-- Scissors: centred under the camera, diagonal like the demo video.
+		     Long axis at +45 deg (handles upper-right, blade tip lower-left in cam).
+		     Positioned at the same XY as the old Cylinder so the arm can reach it.
+		     Handles are 4 cm tall (z half-size=0.020) so the gripper can close
+		     vertically without the lower finger hitting the table. -->
+		<body name="scissors" pos="1.4 0.6 0.755" euler="0 0 1.5708">
+			<joint name="scissors" type="free" />
+			<!-- Blades: two flat boxes, 10 cm long, 0.8 cm tall -->
+			<geom name="scissors_blade1" type="box"
+			      size="0.050 0.007 0.004" pos="0.053 0.005 0.004"
+			      rgba="0.80 0.80 0.85 1" condim="6" mass="0.00005"
+			      friction="3.0 0.3 0.05"/>
+			<geom name="scissors_blade2" type="box"
+			      size="0.050 0.007 0.004" pos="0.053 -0.005 -0.004"
+			      rgba="0.80 0.80 0.85 1" condim="6" mass="0.00005"
+			      friction="3.0 0.3 0.05"/>
+			<!-- Pivot pin -->
+			<geom name="scissors_pivot" type="cylinder"
+			      size="0.006 0.008" pos="0.0 0.0 0.0"
+			      rgba="0.35 0.35 0.35 1" condim="6" mass="0.00005"
+			      friction="3.0 0.3 0.05"/>
+			<!-- Handle 1 — finger ring: capsule frame, naturally rounded corners -->
+			<geom name="scissors_h1_outer" type="capsule"
+			      fromto="-0.060 0.065 0.000  -0.006 0.065 0.000" size="0.012"
+			      rgba="0.15 0.15 0.15 1" condim="6" mass="0.00005" friction="4.0 0.5 0.1"/>
+			<geom name="scissors_h1_inner" type="capsule"
+			      fromto="-0.060 0.011 0.000  -0.006 0.011 0.000" size="0.012"
+			      rgba="0.15 0.15 0.15 1" condim="6" mass="0.00005" friction="4.0 0.5 0.1"/>
+			<geom name="scissors_h1_left" type="capsule"
+			      fromto="-0.060 0.011 0.000  -0.060 0.065 0.000" size="0.012"
+			      rgba="0.15 0.15 0.15 1" condim="6" mass="0.00005" friction="4.0 0.5 0.1"/>
+			<geom name="scissors_h1_right" type="capsule"
+			      fromto="-0.006 0.011 0.000  -0.006 0.065 0.000" size="0.012"
+			      rgba="0.15 0.15 0.15 1" condim="6" mass="0.00005" friction="4.0 0.5 0.1"/>
+			<!-- Handle 2 — thumb ring: capsule frame, naturally rounded corners -->
+			<geom name="scissors_h2_outer" type="capsule"
+			      fromto="-0.058 -0.053 0.000  -0.008 -0.053 0.000" size="0.010"
+			      rgba="0.15 0.15 0.15 1" condim="6" mass="0.00005" friction="4.0 0.5 0.1"/>
+			<geom name="scissors_h2_inner" type="capsule"
+			      fromto="-0.058 -0.007 0.000  -0.008 -0.007 0.000" size="0.010"
+			      rgba="0.15 0.15 0.15 1" condim="6" mass="0.00005" friction="4.0 0.5 0.1"/>
+			<geom name="scissors_h2_left" type="capsule"
+			      fromto="-0.058 -0.053 0.000  -0.058 -0.007 0.000" size="0.010"
+			      rgba="0.15 0.15 0.15 1" condim="6" mass="0.00005" friction="4.0 0.5 0.1"/>
+			<geom name="scissors_h2_right" type="capsule"
+			      fromto="-0.008 -0.053 0.000  -0.008 -0.007 0.000" size="0.010"
+			      rgba="0.15 0.15 0.15 1" condim="6" mass="0.00005" friction="4.0 0.5 0.1"/>
+		</body>
+
+		<!--Zones-->
+		<body name="zone_pickup" pos="1.4 0.6 0.73" quat="1 0 0 0">
+			<geom name="zone_pickup" type="box" size="0.2 0.6 0.01" rgba="0 1 0 0.1" contype="0" conaffinity="0"/>
+		</body>
+		<body name="zone_drop" pos="0.2 0.2 0.73" quat="1 0 0 0">
+			<geom name="zone_drop" type="box" size="0.2 0.2 0.01" rgba="1 0 0 0.1" contype="0" conaffinity="0"/>
+		</body>
+
+        <!--table -->
+		<body name = "table1" euler="0 0 0" pos= "0.8 0 0.74" >
+		  <geom name = "table1" type="mesh" mesh="table" group="2" rgba="0.35 0.35 0.35 1" mass="0" contype="0" conaffinity="0"/>
+		</body>
+		<body name = "table2" euler="0 0 0" pos= "1.6 0 0.74" >
+		  <geom name = "table2" type="mesh" mesh="table" group="2" rgba="0.35 0.35 0.35 1" mass="0" contype="0" conaffinity="0"/>
+		</body>
+
+		<body name="simple_table" pos="0.8 0.6 0.69" quat="1 0 0 0">
+			<geom name="simple_table" type="box" size="1.2 0.9 0.05" rgba="0.5 0.5 0.5 0.1"
+			      friction="20.0 2.0 0.5"/>
+		</body>
+    </worldbody>
+
+    <contact>
+		<exclude body1="flange" body2="2f85_base" />
+		<exclude body1="wrist_3_link" body2="2f85_base" />
+		<exclude body1="wrist_2_link" body2="2f85_base" />
+	</contact>
+
+	<equality>
+		<weld name="attach" body1="flange" body2="2f85_base" active="false" />
+		<weld name="attach_mocap" body1="mocap" body2="ur5e_base" active="false" />
+	</equality>
+
+</mujoco>
